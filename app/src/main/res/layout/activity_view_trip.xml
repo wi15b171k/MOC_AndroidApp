@@ -1,0 +1,45 @@
+<RelativeLayout android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_trip_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        tools:text="Trip Name"/>
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="450dp"
+        tools:context="com.example.matthias.myapplication.ViewTripActivity"
+        android:layout_below="@id/tv_trip_name"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:src="@drawable/kamera_symbol"
+        android:layout_width="300dp"
+        android:layout_height="800dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="150dp"
+        android:layout_marginRight="16dp"
+        android:background="#000000"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_trip_images"
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:layout_below="@id/map"
+        >
+
+    </android.support.v7.widget.RecyclerView>
+
+</RelativeLayout>
+
+

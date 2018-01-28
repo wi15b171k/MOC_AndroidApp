@@ -22,10 +22,30 @@
             android:layout_height="wrap_content"
             android:src="@drawable/logo"
             android:layout_marginTop="50dp"
-            android:layout_marginBottom="50dp"/>
+            android:layout_marginBottom="20dp"/>
 
         <EditText
-            android:id="@+id/et_login_mail"
+            android:id="@+id/et_register_first_name"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:hint="First name"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"/>
+
+        <EditText
+            android:id="@+id/et_register_last_name"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:hint="Last name"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"/>
+
+        <EditText
+            android:id="@+id/et_register_mail"
             android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:textAlignment="center"
@@ -45,56 +65,34 @@
             android:inputType="textPassword"
             android:textSize="22sp"/>
 
+        <EditText
+            android:id="@+id/et_login_pwd_confirm"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:hint="Confirm password"
+            android:textColor="#FFFFFF"
+            android:inputType="textPassword"
+            android:textSize="22sp"/>
+
         <Button
             android:id="@+id/btn_login"
             android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Login"
+            android:text="Register"
             android:textColor="#000000"
             android:background="#FFFFFF"
             android:layout_marginTop="20dp">
-
-            <requestFocus/>
         </Button>
 
-        <LinearLayout
+        <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:orientation="horizontal"
-            android:layout_gravity="center">
-
-            <TextView
-                android:id="@+id/tv_register"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Register"
-                android:clickable="true"
-                android:focusable="true"
-                android:layout_marginLeft="20dp"
-                android:textSize="22sp"
-                android:textColor="#555555"/>
-
-            <TextView
-                android:id="@+id/tv_forgot_pwd"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Passwort?"
-                android:clickable="true"
-                android:layout_marginLeft="100dp"
-                android:textSize="22sp"
-                android:textColor="#555555"/>
-
-        </LinearLayout>
+            android:text="I agree with terms and conditions"
+            android:layout_gravity="center"/>
 
     </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/pb_login_in_progress"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_gravity="center"
-        android:visibility="invisible"/>
 
 </FrameLayout>
