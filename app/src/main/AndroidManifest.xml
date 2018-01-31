@@ -49,7 +49,12 @@
 
         <activity
             android:name=".ViewTripActivity"
-            android:label="@string/title_activity_view_trip"></activity>
+            android:label="@string/title_activity_view_trip" />
+        <activity
+            android:name=".FullscreenImageViewActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_fullscreen_image_view"
+            android:theme="@style/FullscreenTheme"></activity>
     </application>
 
 </manifest>
