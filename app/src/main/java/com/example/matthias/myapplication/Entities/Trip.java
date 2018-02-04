@@ -1,13 +1,17 @@
 package com.example.matthias.myapplication.Entities;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Matthias on 28.01.2018.
  */
 
-public class Trip {
+public class Trip implements Serializable {
     public int id;
     public String name;
-    public List<Coordinate> coordinates;
+    public List<LatLng> coordinates;
+    public boolean isUserTrip;
 }

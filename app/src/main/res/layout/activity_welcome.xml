@@ -1,55 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.example.matthias.myapplication.WelcomeActivity"
-    android:orientation="vertical">
+<FrameLayout android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent">
 
-    <ImageView
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/logo"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="20dp"
-        android:clickable="true"/>
+        android:layout_height="match_parent"
+        tools:context="com.example.matthias.myapplication.WelcomeActivity"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tv_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logo"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="20dp"
+            android:clickable="true"/>
+
+        <TextView
+            android:id="@+id/tv_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            tools:text="Welcome Username"
+            android:textSize="22sp"
+            android:layout_marginBottom="50sp"/>
+
+        <Button
+            android:id="@+id/btn_my_latest_trip"
+            android:layout_width="250sp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="My latest trip"/>
+
+        <Button
+            android:id="@+id/btn_start_new_trip"
+            android:layout_width="250sp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Start a new trip"/>
+
+        <Button
+            android:id="@+id/btn_my_trips"
+            android:layout_width="250sp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="My trips"/>
+
+        <Button
+            android:id="@+id/btn_friends_trips"
+            android:layout_width="250sp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Friend's trips"/>
+
+        <TextView
+            android:id="@+id/tv_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginTop="50dp"
+            android:layout_marginRight="30dp"
+            android:text="Logout"
+            android:clickable="true"
+            android:textColor="#000000"
+            android:textSize="22sp"
+            />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/pb_welcome_progress_bar"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         android:layout_gravity="center"
-        tools:text="Welcome Username"
-        android:textSize="22sp"
-        android:layout_marginBottom="50sp"/>
-
-    <Button
-        android:id="@+id/btn_my_latest_trip"
-        android:layout_width="250sp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="My latest trip"/>
-
-    <Button
-        android:id="@+id/btn_start_new_trip"
-        android:layout_width="250sp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Start a new trip"/>
-
-    <Button
-        android:id="@+id/btn_my_trips"
-        android:layout_width="250sp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="My trips"/>
-
-    <Button
-        android:id="@+id/btn_friends_trips"
-        android:layout_width="250sp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Friend's trips"/>
-
-</LinearLayout>
+        android:visibility="invisible"
+        />
+</FrameLayout>

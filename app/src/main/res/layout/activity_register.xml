@@ -55,7 +55,7 @@
             android:textSize="22sp"/>
 
         <EditText
-            android:id="@+id/et_login_pwd"
+            android:id="@+id/et_register_pwd"
             android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:textAlignment="center"
@@ -66,7 +66,7 @@
             android:textSize="22sp"/>
 
         <EditText
-            android:id="@+id/et_login_pwd_confirm"
+            android:id="@+id/et_register_pwd_confirm"
             android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:textAlignment="center"
@@ -77,7 +77,7 @@
             android:textSize="22sp"/>
 
         <Button
-            android:id="@+id/btn_login"
+            android:id="@+id/btn_register"
             android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -88,10 +88,12 @@
         </Button>
 
         <CheckBox
+            android:id="@+id/cb_terms"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="I agree with terms and conditions"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:buttonTint="#000000"/>
 
     </LinearLayout>
 

@@ -1,5 +1,6 @@
 package com.example.matthias.myapplication;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.FragmentActivity;
@@ -8,19 +9,23 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 
+import com.example.matthias.myapplication.Entities.Trip;
 import com.example.matthias.myapplication.ImageDisplay.TripImagesAdapter;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class ViewTripActivity extends FragmentActivity implements OnMapReadyCallback {
+public class ViewTripActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     TextView mTripName;
     private GoogleMap mMap;
     RecyclerView mImageList;
+
+    Trip trip;
 
     TripImagesAdapter mAdapter;
 
@@ -34,8 +39,8 @@ public class ViewTripActivity extends FragmentActivity implements OnMapReadyCall
         mapFragment.getMapAsync(this);
 
         mTripName = (TextView) findViewById(R.id.tv_trip_name);
-        String trip = getIntent().getStringExtra("trip");
-        mTripName.setText(trip);
+        trip = (Trip)getIntent().getSerializableExtra("trip");
+        mTripName.setText(trip.name);
 
         mImageList = (RecyclerView) findViewById(R.id.rv_trip_images);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -77,9 +82,19 @@ public class ViewTripActivity extends FragmentActivity implements OnMapReadyCall
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        mMap.setOnMarkerClickListener(this);
+
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        Marker marker = mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Intent intent = new Intent(this, FullscreenImageViewActivity.class);
+        startActivity(intent);
+
+        return true;
     }
 }

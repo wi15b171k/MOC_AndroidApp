@@ -1,6 +1,9 @@
 package com.example.matthias.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.matthias.myapplication.web.DataProvider;
+import com.example.matthias.myapplication.web.InternetConnection;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -23,12 +29,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button mLogin;
     ProgressBar mLoginProgress;
 
+    SharedPreferences settings;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Hide title bar
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+
+        settings = getSharedPreferences(getResources().getString(R.string.shared_preferences), MODE_PRIVATE);
+        if (settings.getString("access_token", "") != "") {
+            redirectToWelcome();
+        }
 
         mMailAddress = (EditText) findViewById(R.id.et_login_mail);
         mPassword = (EditText) findViewById(R.id.et_login_pwd);
@@ -40,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mLogin.setOnClickListener(this);
 
         mLoginProgress = (ProgressBar) findViewById(R.id.pb_login_in_progress);
+
+
     }
 
     @Override
@@ -59,18 +74,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void loginUser() {
         mLoginProgress.setVisibility(View.VISIBLE);
 
-        String user = mMailAddress.getText().toString();
-        String password = mPassword.getText().toString();
+        final String user = mMailAddress.getText().toString();
+        final String password = mPassword.getText().toString();
 
-        if (DataProvider.login(user, password).isValid()) {
-            Intent intent = new Intent(this, WelcomeActivity.class);
-            intent.putExtra("user", user);
-            mMailAddress.setText("");
-            startActivity(intent);
-        } else {
-            //TODO failed login behandeln
-        }
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... voids) {
+                try {
+                    return DataProvider.login(user, password);
+                } catch (IOException e) {
+                    return InternetConnection.BAD_REQUEST;
+                }
+            }
 
-        mLoginProgress.setVisibility(View.INVISIBLE);
+            @Override
+            protected void onPostExecute(String s) {
+                if (s != InternetConnection.BAD_REQUEST) {
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString("access_token", s);
+                    editor.putString("user_name", user);
+                    editor.commit();
+
+                    mMailAddress.setText("");
+                    mPassword.setText("");
+                    redirectToWelcome();
+                } else {
+                    Toast.makeText(MainActivity.this, "Login failed. Please try again", Toast.LENGTH_SHORT).show();
+                    mPassword.setText("");
+                }
+
+                mLoginProgress.setVisibility(View.INVISIBLE);
+            }
+        }.execute();
+    }
+
+    private void redirectToWelcome() {
+        Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
+        startActivity(intent);
     }
 }
