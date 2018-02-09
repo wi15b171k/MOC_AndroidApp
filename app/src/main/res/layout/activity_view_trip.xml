@@ -31,14 +31,25 @@
         android:layout_marginRight="16dp"
         android:background="#000000"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_trip_images"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="110dp"
-        android:layout_below="@id/map"
-        >
+        android:layout_below="@id/map">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_trip_images"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
 
-    </android.support.v7.widget.RecyclerView>
+        </android.support.v7.widget.RecyclerView>
+
+        <ProgressBar
+            android:id="@+id/pb_load_thumbnails"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:visibility="invisible"/>
+    </FrameLayout>
 
 </RelativeLayout>
 

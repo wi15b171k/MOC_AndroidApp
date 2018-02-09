@@ -107,7 +107,6 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void startNewTrip() {
-
     }
 
     private void openMyLatestTrip() {

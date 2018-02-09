@@ -1,16 +1,21 @@
 package com.example.matthias.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.matthias.myapplication.Entities.Trip;
+import com.example.matthias.myapplication.Entities.UserImage;
 import com.example.matthias.myapplication.ImageDisplay.TripImagesAdapter;
+import com.example.matthias.myapplication.web.DataProvider;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -18,6 +23,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ViewTripActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -28,18 +37,31 @@ public class ViewTripActivity extends FragmentActivity implements OnMapReadyCall
     Trip trip;
 
     TripImagesAdapter mAdapter;
+    List<UserImage> thumbnails;
+    List<Marker> markers;
+
+    ProgressBar mThumbnailsLoading;
+
+    private SharedPreferences settings;
+    private String accessToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_trip);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+
+        settings = getSharedPreferences(getResources().getString(R.string.shared_preferences), MODE_PRIVATE);
+        accessToken = settings.getString("access_token", "");
+
+        trip = (Trip)getIntent().getSerializableExtra("trip");
+
+        mThumbnailsLoading = (ProgressBar) findViewById(R.id.pb_load_thumbnails);
+        thumbnails = new ArrayList<UserImage>();
+        markers = new ArrayList<Marker>();
+
+        loadMap();
 
         mTripName = (TextView) findViewById(R.id.tv_trip_name);
-        trip = (Trip)getIntent().getSerializableExtra("trip");
         mTripName.setText(trip.name);
 
         mImageList = (RecyclerView) findViewById(R.id.rv_trip_images);
@@ -48,8 +70,37 @@ public class ViewTripActivity extends FragmentActivity implements OnMapReadyCall
         mImageList.setLayoutManager(layoutManager);
 
         mAdapter = new TripImagesAdapter();
-        loadDummyImages();
+        //loadDummyImages();
         mImageList.setAdapter(mAdapter);
+    }
+
+    private void loadMap() {
+        new AsyncTask<Void, Void, List<UserImage>>() {
+            @Override
+            protected List<UserImage> doInBackground(Void... voids) {
+                try {
+                    return DataProvider.getPicInfoByTripId(accessToken, trip.id);
+                } catch (IOException e) {
+                    return new ArrayList<UserImage>();
+                }
+            }
+
+            @Override
+            protected void onPostExecute(List<UserImage> userImage) {
+                setThumbnails(userImage);
+
+                // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+                SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.map);
+                mapFragment.getMapAsync(ViewTripActivity.this);
+
+                //TODO loop through images
+            }
+        }.execute();
+    }
+
+    private void setThumbnails(List<UserImage> userImage) {
+        thumbnails = userImage;
     }
 
     private void loadDummyImages() {
@@ -84,10 +135,23 @@ public class ViewTripActivity extends FragmentActivity implements OnMapReadyCall
 
         mMap.setOnMarkerClickListener(this);
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        Marker marker = mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        List<LatLng> set = new ArrayList<LatLng>();
+
+        for (UserImage item :
+                thumbnails) {
+            LatLng coordinates = new LatLng(item.coordinates.latitude, item.coordinates.longitude);
+
+            if (!set.contains(coordinates)) {
+                set.add(coordinates);
+                Marker marker = mMap.addMarker(new MarkerOptions().position(coordinates));
+                markers.add(marker);
+            }
+        }
+
+        if (markers.size() > 0) {
+            LatLng position = markers.get(0).getPosition();
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 12));
+        }
     }
 
     @Override

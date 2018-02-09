@@ -9,4 +9,5 @@ import android.graphics.Bitmap;
 public class UserImage {
     public int id;
     public Bitmap image;
+    public Coordinates coordinates;
 }

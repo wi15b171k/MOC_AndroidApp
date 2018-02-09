@@ -32,7 +32,7 @@ public class InternetConnection {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(REQUEST_POST);
-        connection.setRequestProperty("Host", "localhost:48897");
+        //connection.setRequestProperty("Host", "localhost:48897");
         connection.setRequestProperty("Content-Type", "application/json");
 
         if (useToken) {
@@ -64,7 +64,7 @@ public class InternetConnection {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(requestMethod);
-        connection.setRequestProperty("Host", "localhost:48897");
+        //connection.setRequestProperty("Host", "localhost:48897");
 
         if (useToken) {
             connection.setRequestProperty("authorization", "bearer " + token);

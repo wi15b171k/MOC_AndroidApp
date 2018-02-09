@@ -2,6 +2,8 @@ package com.example.matthias.myapplication.Entities;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 
@@ -12,6 +14,6 @@ import java.util.List;
 public class Trip implements Serializable {
     public int id;
     public String name;
-    public List<LatLng> coordinates;
+    public transient List<Coordinates> coordinates;
     public boolean isUserTrip;
 }

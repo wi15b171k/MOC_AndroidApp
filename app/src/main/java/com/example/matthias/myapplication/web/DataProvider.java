@@ -3,10 +3,10 @@ package com.example.matthias.myapplication.web;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.example.matthias.myapplication.Entities.Coordinates;
 import com.example.matthias.myapplication.Entities.Person;
 import com.example.matthias.myapplication.Entities.Trip;
 import com.example.matthias.myapplication.Entities.UserImage;
-import com.google.android.gms.maps.model.LatLng;
 
 
 import org.json.JSONArray;
@@ -23,7 +23,7 @@ import java.util.List;
 
 public class DataProvider {
 
-    private static final String BASE_URL = "http://10.0.2.2:48897/"; //Fürs HAndy - IP vom Laptop
+    private static final String BASE_URL = "http://wi-gate.technikum-wien.at:60349/"; //Fürs HAndy - IP vom Laptop
     //private static final String BASE_URL = "http://10.0.2.2:48897/"; //Für den Emulatr
     private static final String LOG_TAG = DataProvider.class.getCanonicalName();
 
@@ -95,7 +95,7 @@ public class DataProvider {
                 trip.name = json.getString("Title");
                 trip.isUserTrip = true;
 
-                trip.coordinates = new ArrayList<LatLng>();
+                trip.coordinates = new ArrayList<Coordinates>();
 
                 JSONArray coordinates = json.getJSONArray("Coordinates");
                 for (int i = 0; i < coordinates.length(); i++) {
@@ -104,7 +104,7 @@ public class DataProvider {
                     double lat = item.getDouble("Latitude");
                     double lng = item.getDouble("Longitude");
 
-                    trip.coordinates.add(new LatLng(lat, lng));
+                    trip.coordinates.add(new Coordinates(lat, lng));
                 }
             }
         } catch (JSONException e) {
@@ -115,9 +115,35 @@ public class DataProvider {
         return trip;
     }
 
-    public List<LatLng> getCoordinatesByTripId(String token, int tripId) {
-        //TODO call data provider
-        return new ArrayList<LatLng>();
+    public static List<UserImage> getPicInfoByTripId(String token, int tripId) throws IOException {
+        String urlString = BASE_URL + "api/pics/" + tripId;
+
+        String response = InternetConnection.sendStringToServer(urlString, "", InternetConnection.REQUEST_GET, token, true);
+        Log.d(LOG_TAG, "String response: " + response);
+
+        ArrayList<UserImage> userImages = new ArrayList<UserImage>();
+
+        if (response != InternetConnection.BAD_REQUEST) {
+            try {
+                JSONArray jsonArray = new JSONArray(response);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject item = jsonArray.getJSONObject(i);
+
+                    UserImage userImage = new UserImage();
+                    userImage.id = item.getInt("PhotoId");
+                    userImage.coordinates = new Coordinates(
+                            item.getJSONObject("Coordinate").getDouble("Latitude"),
+                            item.getJSONObject("Coordinate").getDouble("Longitude")
+                    );
+
+                    userImages.add(userImage);
+                }
+            } catch (JSONException e) {
+                userImages = new ArrayList<UserImage>();
+            }
+        }
+
+        return userImages;
     }
 
     public static List<Bitmap> getPicsByTripId(String token, int tripId) {
@@ -125,12 +151,12 @@ public class DataProvider {
         return new ArrayList<Bitmap>();
     }
 
-    public static List<UserImage> getMultiplePicsByCoordinates(String token, int tripId, List<LatLng> coordinates) {
+    public static List<UserImage> getMultiplePicsByCoordinates(String token, int tripId, List<Coordinates> coordinates) {
         //TODO call data provider
         return new ArrayList<UserImage>();
     }
 
-    public static boolean savePicForTrip(String token, int tripId, Bitmap image, LatLng coordinate) {
+    public static boolean savePicForTrip(String token, int tripId, Bitmap image, Coordinates coordinate) {
         //TODO call data provider
         return true;
     }
