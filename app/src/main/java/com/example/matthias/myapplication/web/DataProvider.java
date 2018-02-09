@@ -146,9 +146,14 @@ public class DataProvider {
         return userImages;
     }
 
-    public static List<Bitmap> getPicsByTripId(String token, int tripId) {
-        //TODO call data provider
-        return new ArrayList<Bitmap>();
+    public static Bitmap getPicByPicId(String token, int picId, int width, int height) throws IOException {
+        String urlString = BASE_URL + "api/pic/" + picId + "/" + width + "/" + height;
+
+        Bitmap response = InternetConnection.getImageFromServer(urlString, "", InternetConnection.REQUEST_GET, token, true);
+
+        Log.d(LOG_TAG, "Response from image: " + response);
+
+        return response;
     }
 
     public static List<UserImage> getMultiplePicsByCoordinates(String token, int tripId, List<Coordinates> coordinates) {

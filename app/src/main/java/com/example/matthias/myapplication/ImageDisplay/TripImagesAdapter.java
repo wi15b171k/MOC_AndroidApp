@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.matthias.myapplication.Entities.UserImage;
 import com.example.matthias.myapplication.R;
 
 import java.util.ArrayList;
@@ -17,10 +18,12 @@ import java.util.ArrayList;
  */
 
 public class TripImagesAdapter extends RecyclerView.Adapter<TripImagesAdapter.ImageViewHolder> {
-    ArrayList<Bitmap> images;
+    ArrayList<UserImage> images;
+
+    private ImageView selectedView;
 
     public TripImagesAdapter() {
-        images = new ArrayList<Bitmap>();
+        images = new ArrayList<UserImage>();
     }
 
     @Override
@@ -41,7 +44,11 @@ public class TripImagesAdapter extends RecyclerView.Adapter<TripImagesAdapter.Im
         return images.size();
     }
 
-    public class ImageViewHolder extends RecyclerView.ViewHolder {
+    public interface OnClickListener {
+        public void onClick(UserImage userImage);
+    }
+
+    public class ImageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView image;
 
         public ImageViewHolder(View itemView) {
@@ -50,11 +57,29 @@ public class TripImagesAdapter extends RecyclerView.Adapter<TripImagesAdapter.Im
         }
 
         public void bind(int position) {
-            image.setImageBitmap(images.get(position));
+            image.setImageBitmap(images.get(position).image);
+        }
+
+        @Override
+        public void onClick(View view) {
+            selectedView.setPadding(0,0,0,0);
+            ImageView sel = ((ImageView)view.findViewById(R.id.iv_trip_image));
+            sel.setPadding(2,2,2,2);
+            selectedView = sel;
         }
     }
 
-    public void addBitmap(Bitmap bitmap) {
-        images.add(bitmap);
+    public void addUserImage(UserImage userImage) {
+        images.add(userImage);
+        notifyDataSetChanged();
+    }
+
+    public boolean hasUserImage(int picId) {
+        for (UserImage item:
+             images) {
+            if (item.id == picId) return true;
+        }
+
+        return false;
     }
 }

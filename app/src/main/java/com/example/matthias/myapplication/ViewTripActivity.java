@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ViewTripActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -44,6 +46,8 @@ public class ViewTripActivity extends FragmentActivity implements OnMapReadyCall
 
     private SharedPreferences settings;
     private String accessToken;
+
+    AtomicInteger thumbnailsToLoad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,16 +98,58 @@ public class ViewTripActivity extends FragmentActivity implements OnMapReadyCall
                         .findFragmentById(R.id.map);
                 mapFragment.getMapAsync(ViewTripActivity.this);
 
-                //TODO loop through images
+                loadThumbnails();
             }
         }.execute();
+    }
+
+    private void loadThumbnails() {
+        mThumbnailsLoading.setVisibility(View.VISIBLE);
+        thumbnailsToLoad = new AtomicInteger( thumbnails.size() );
+
+        for (UserImage item :
+                thumbnails) {
+            final int picId = item.id;
+            new AsyncTask<Void, Void, Bitmap>() {
+                @Override
+                protected Bitmap doInBackground(Void... voids) {
+                    try {
+                        return DataProvider.getPicByPicId(accessToken, picId, 100, 100);
+                    } catch (IOException e) {
+                        return BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.error);
+                    }
+                }
+
+                @Override
+                protected void onPostExecute(Bitmap bitmap) {
+                    setThumbnailForUserImage(picId, bitmap);
+                }
+            }.execute();
+        }
+    }
+
+    private void setThumbnailForUserImage(int picId, Bitmap bitmap) {
+        for (UserImage item :
+                thumbnails) {
+            if (item.id == picId) {
+                item.image = bitmap;
+                if (!mAdapter.hasUserImage(picId)) {
+                    mAdapter.addUserImage(item);
+                }
+
+                if ( thumbnailsToLoad.decrementAndGet() == 0 ) {
+                    mThumbnailsLoading.setVisibility(View.INVISIBLE);
+                }
+
+            }
+        }
     }
 
     private void setThumbnails(List<UserImage> userImage) {
         thumbnails = userImage;
     }
 
-    private void loadDummyImages() {
+    /*private void loadDummyImages() {
         Bitmap im1  = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.globus);
         Bitmap im2  = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.info);
         Bitmap im3  = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.kamera);
@@ -117,7 +163,7 @@ public class ViewTripActivity extends FragmentActivity implements OnMapReadyCall
         mAdapter.addBitmap(im4);
         mAdapter.addBitmap(im5);
         mAdapter.addBitmap(im6);
-    }
+    }*/
 
 
     /**

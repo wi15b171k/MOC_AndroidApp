@@ -3,4 +3,5 @@
     android:id="@+id/iv_trip_image"
     android:layout_width="100dp"
     android:layout_margin="5dp"
-    xmlns:android="http://schemas.android.com/apk/res/android" />
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/colorPrimaryDark"/>

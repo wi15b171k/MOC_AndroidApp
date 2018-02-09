@@ -1,9 +1,12 @@
 package com.example.matthias.myapplication.web;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -98,5 +101,45 @@ public class InternetConnection {
         connection.disconnect();
 
         return inMessage;
+    }
+
+    public static Bitmap getImageFromServer(String urlString, String message, String requestMethod, String token, boolean useToken) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod(requestMethod);
+        //connection.setRequestProperty("Host", "localhost:48897");
+
+        if (useToken) {
+            connection.setRequestProperty("authorization", "bearer " + token);
+        }
+
+        Log.d(LOG_TAG, "Connecting to URL: " + urlString);
+        Log.d(LOG_TAG, "Message to send: " + message);
+
+        Log.d(LOG_TAG, connection.getRequestProperties().toString());
+
+        if (requestMethod == REQUEST_POST) {
+            connection.setDoOutput(true);
+            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+            out.writeBytes(message);
+            out.flush();
+            out.close();
+        }
+
+        int responseCode = connection.getResponseCode();
+        String responseMessage = connection.getResponseMessage();
+        Log.d(LOG_TAG, "Code " + responseCode + ": " + responseMessage);
+
+        Bitmap ret = null;
+
+        if (responseCode == 200) {
+            BufferedInputStream in = new BufferedInputStream(connection.getInputStream());
+            ret = BitmapFactory.decodeStream(in);
+            Log.d(LOG_TAG, "Response message: " + ret);
+        }
+
+        connection.disconnect();
+
+        return ret;
     }
 }
