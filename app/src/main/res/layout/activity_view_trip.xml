@@ -22,6 +22,7 @@
         android:layout_below="@id/tv_trip_name"/>
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_take_picture"
         android:src="@drawable/kamera_symbol"
         android:layout_width="300dp"
         android:layout_height="800dp"
@@ -50,6 +51,13 @@
             android:layout_gravity="center"
             android:visibility="invisible"/>
     </FrameLayout>
+
+    <ProgressBar
+        android:id="@+id/pb_saving_image"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_centerInParent="true"
+        android:visibility="invisible"/>
 
 </RelativeLayout>
 

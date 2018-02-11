@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
+    android:background="#000000"
     tools:context="com.example.matthias.myapplication.FullscreenImageViewActivity">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -47,6 +47,7 @@
             <Button
                 android:id="@+id/dummy_button"
                 style="?metaButtonBarButtonStyle"
+                android:background="#333333"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -54,5 +55,13 @@
 
         </LinearLayout>
     </FrameLayout>
+
+    <ProgressBar
+        android:id="@+id/pb_loading_images"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_gravity="center"
+        android:visibility="invisible"
+        />
 
 </FrameLayout>

@@ -1,23 +1,38 @@
 package com.example.matthias.myapplication;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.example.matthias.myapplication.Entities.Trip;
+import com.example.matthias.myapplication.Entities.UserImage;
 import com.example.matthias.myapplication.ImageDisplay.FullscreenImageAdapter;
+import com.example.matthias.myapplication.web.DataProvider;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class FullscreenImageViewActivity extends AppCompatActivity {
+public class FullscreenImageViewActivity extends AppCompatActivity implements View.OnClickListener {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -59,10 +74,10 @@ public class FullscreenImageViewActivity extends AppCompatActivity {
         @Override
         public void run() {
             // Delayed display of UI elements
-            ActionBar actionBar = getSupportActionBar();
+            /*ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
                 actionBar.show();
-            }
+            }*/
             mControlsView.setVisibility(View.VISIBLE);
         }
     };
@@ -90,12 +105,33 @@ public class FullscreenImageViewActivity extends AppCompatActivity {
 
     ViewPager mImageViewer;
     FullscreenImageAdapter mViewerAdapter;
+    ProgressBar mLoadingProgress;
+    Button mPicAction;
+
+    Trip trip;
+
+    SharedPreferences settings;
+    String accessToken;
+
+    AtomicInteger imagesToLoad;
+    ArrayList<UserImage> images;
+
+    boolean allowDelete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_fullscreen_image_view);
+
+        allowDelete = false; //Löschen erst aktivieren, wenn alle Bilder geladen sind, sonst gibt's einen Fehler
+
+        Intent intent = getIntent();
+        trip = (Trip)intent.getSerializableExtra("trip");
+        images = (ArrayList<UserImage>)intent.getSerializableExtra("picInfos");
+
+        settings = getSharedPreferences(getResources().getString(R.string.shared_preferences), MODE_PRIVATE);
+        accessToken = settings.getString("access_token", "");
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
@@ -110,18 +146,78 @@ public class FullscreenImageViewActivity extends AppCompatActivity {
             }
         });
 
+        mLoadingProgress = (ProgressBar) findViewById(R.id.pb_loading_images);
+
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+        mPicAction = (Button) findViewById(R.id.dummy_button);
+
+        if (trip.isUserTrip) {
+            mPicAction.setText("Löschen");
+        } else {
+            mPicAction.setText("Melden");
+        }
+
+        mPicAction.setOnTouchListener(mDelayHideTouchListener);
+        mPicAction.setOnClickListener(this);
 
         mImageViewer = findViewById(R.id.vp_image_viewer);
         mViewerAdapter = new FullscreenImageAdapter(this);
         mImageViewer.setAdapter(mViewerAdapter);
-        loadDummyImages();
+        mImageViewer.addOnPageChangeListener(mViewerAdapter);
+        //loadDummyImages();
+        startLoading();
     }
 
-    private void loadDummyImages() {
+    private void startLoading() {
+        mLoadingProgress.setVisibility(View.VISIBLE);
+        imagesToLoad = new AtomicInteger(images.size());
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        final int height = metrics.heightPixels;
+        final int width = metrics.widthPixels;
+
+        for (UserImage item :
+                images) {
+            final int picId = item.id;
+
+            new AsyncTask<Void, Void, Bitmap>() {
+                @Override
+                protected Bitmap doInBackground(Void... voids) {
+                    try {
+                        return DataProvider.getPicByPicId(accessToken, picId, 0, 0);
+                    } catch (IOException e) {
+                        return BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.error);
+                    }
+                }
+
+                @Override
+                protected void onPostExecute(Bitmap bitmap) {
+                    addImage(picId, bitmap);
+                }
+            }.execute();
+        }
+    }
+
+    private void addImage(int picId, Bitmap bitmap) {
+        for (UserImage item :
+                images) {
+            if (item.id == picId) {
+                item.image = bitmap;
+                mViewerAdapter.addImage(item);
+
+                if (imagesToLoad.decrementAndGet() == 0) {
+                    mLoadingProgress.setVisibility(View.INVISIBLE);
+                    allowDelete = true;
+                }
+            }
+        }
+    }
+
+    /*private void loadDummyImages() {
         Bitmap im1  = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.globus);
         Bitmap im2  = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.info);
         Bitmap im3  = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.kamera);
@@ -135,7 +231,7 @@ public class FullscreenImageViewActivity extends AppCompatActivity {
         mViewerAdapter.addImage(im4);
         mViewerAdapter.addImage(im5);
         mViewerAdapter.addImage(im6);
-    }
+    }*/
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -188,5 +284,72 @@ public class FullscreenImageViewActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.dummy_button:
+                if (!allowDelete) {
+                    Toast.makeText(this, "Please wait until all images are loaded", Toast.LENGTH_SHORT).show();
+                } else {
+                    if (trip.isUserTrip) {
+                        deleteCurrentPicture();
+                    } else {
+                        meldeCurrentPicture();
+                    }
+                }
+                break;
+        }
+    }
+
+    private void meldeCurrentPicture() {
+        final int currentPicId = mViewerAdapter.getCurrentPicId();
+
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                try {
+                    return DataProvider.meldePicById(accessToken, currentPicId);
+                } catch (IOException e) {
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                if (aBoolean) {
+                    Toast.makeText(FullscreenImageViewActivity.this, "Successullfy reported picture", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(FullscreenImageViewActivity.this, "Reporting failed. Please try again", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }.execute();
+    }
+
+    private void deleteCurrentPicture() {
+        final int currentPicId = mViewerAdapter.getCurrentPicId();
+
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                try {
+                    return DataProvider.deletePicById(accessToken, currentPicId);
+                } catch (IOException e) {
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                if (aBoolean) {
+                    mViewerAdapter.removeImage(currentPicId);
+                    mImageViewer.setAdapter(mViewerAdapter);
+                    Toast.makeText(FullscreenImageViewActivity.this, "Delete successful", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(FullscreenImageViewActivity.this, "Delete failed. Please try again", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }.execute();
     }
 }

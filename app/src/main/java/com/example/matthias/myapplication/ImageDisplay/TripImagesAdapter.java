@@ -3,10 +3,12 @@ package com.example.matthias.myapplication.ImageDisplay;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.matthias.myapplication.Entities.UserImage;
 import com.example.matthias.myapplication.R;
@@ -18,12 +20,15 @@ import java.util.ArrayList;
  */
 
 public class TripImagesAdapter extends RecyclerView.Adapter<TripImagesAdapter.ImageViewHolder> {
+    private static final String LOG_TAG = TripImagesAdapter.class.getCanonicalName();
     ArrayList<UserImage> images;
 
     private ImageView selectedView;
+    UserImageClickedListener listener;
 
-    public TripImagesAdapter() {
+    public TripImagesAdapter(UserImageClickedListener listener) {
         images = new ArrayList<UserImage>();
+        this.listener = listener;
     }
 
     @Override
@@ -48,12 +53,17 @@ public class TripImagesAdapter extends RecyclerView.Adapter<TripImagesAdapter.Im
         public void onClick(UserImage userImage);
     }
 
+    public interface UserImageClickedListener {
+        public void onUserImageClicked(UserImage userImage);
+    }
+
     public class ImageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView image;
 
         public ImageViewHolder(View itemView) {
             super(itemView);
             image = (ImageView) itemView.findViewById(R.id.iv_trip_image);
+            itemView.setOnClickListener(this);
         }
 
         public void bind(int position) {
@@ -62,9 +72,11 @@ public class TripImagesAdapter extends RecyclerView.Adapter<TripImagesAdapter.Im
 
         @Override
         public void onClick(View view) {
-            selectedView.setPadding(0,0,0,0);
+            Log.d(LOG_TAG, "Item clicked. Position " + getAdapterPosition());
+            listener.onUserImageClicked(images.get(getAdapterPosition()));
+            if (selectedView != null) selectedView.setPadding(0,0,0,0);
             ImageView sel = ((ImageView)view.findViewById(R.id.iv_trip_image));
-            sel.setPadding(2,2,2,2);
+            sel.setPadding(10,10,10,10);
             selectedView = sel;
         }
     }

@@ -11,24 +11,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.example.matthias.myapplication.Entities.UserImage;
 import com.example.matthias.myapplication.FullscreenImageViewActivity;
 import com.example.matthias.myapplication.R;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by Matthias on 31.01.2018.
  */
 
-public class FullscreenImageAdapter extends PagerAdapter {
+public class FullscreenImageAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener {
     FullscreenImageViewActivity activity;
-    ArrayList<Bitmap> images;
+    CopyOnWriteArrayList<UserImage> images;
     LayoutInflater inflater;
+
+    int currentPosition;
 
     public FullscreenImageAdapter(FullscreenImageViewActivity activity) {
         this.activity = activity;
-        images = new ArrayList<Bitmap>();
+        images = new CopyOnWriteArrayList<UserImage>();
     }
 
     @Override
@@ -47,7 +52,7 @@ public class FullscreenImageAdapter extends PagerAdapter {
         View itemView = inflater.inflate(R.layout.fullscreen_single_image, container, false);
 
         ImageView image = itemView.findViewById(R.id.iv_image_fullscreen_view);
-        image.setImageBitmap(images.get(position));
+        image.setImageBitmap(images.get(position).image);
 
         image.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,8 +69,37 @@ public class FullscreenImageAdapter extends PagerAdapter {
         ((ViewPager) container).removeView((View)object);
     }
 
-    public void addImage(Bitmap bitmap) {
-        images.add(bitmap);
+    public void addImage(UserImage userImage) {
+        images.add(userImage);
         notifyDataSetChanged();
+    }
+
+    public void removeImage(int picId) {
+        for (UserImage item :
+                images) {
+            if (item.id == picId) {
+                images.remove(item);
+                notifyDataSetChanged();
+            }
+        }
+    }
+
+    public int getCurrentPicId() {
+        return images.get(currentPosition).id;
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        currentPosition = position;
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 }

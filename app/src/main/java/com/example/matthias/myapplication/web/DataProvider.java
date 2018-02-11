@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.List;
 
 public class DataProvider {
 
-    private static final String BASE_URL = "http://wi-gate.technikum-wien.at:60349/"; //Fürs HAndy - IP vom Laptop
+    private static final String BASE_URL = "http://wi-gate.technikum-wien.at:60349/"; //Fürs HAndy - IP vom Server
     //private static final String BASE_URL = "http://10.0.2.2:48897/"; //Für den Emulatr
     private static final String LOG_TAG = DataProvider.class.getCanonicalName();
 
@@ -161,19 +162,42 @@ public class DataProvider {
         return new ArrayList<UserImage>();
     }
 
-    public static boolean savePicForTrip(String token, int tripId, Bitmap image, Coordinates coordinate) {
-        //TODO call data provider
-        return true;
+    public static boolean savePicForTrip(String token, int tripId, File file, Coordinates coordinate) throws IOException {
+        String urlString = BASE_URL + "api/pic/" + tripId + "/" + coordinate.latitude + "/" + coordinate.longitude + "/";
+
+        String response = InternetConnection.sendFiletoServer(urlString, file, token, true);
+
+        if (response != InternetConnection.BAD_REQUEST) {
+            return true;
+        }
+
+        return false;
     }
 
-    public static boolean deletePicById(String token, int picId) {
-        //TODO call data provider
-        return true;
+    public static boolean deletePicById(String token, int picId) throws IOException {
+        String urlString = BASE_URL + "api/pic/" + picId;
+
+        String response = InternetConnection.sendStringToServer(urlString, "", InternetConnection.REQUEST_DELETE, token, true);
+
+        if (response != InternetConnection.BAD_REQUEST) return true;
+
+        return false;
     }
 
-    public static boolean meldePicById(String token, int picId) {
-        //TODO call data provider
-        return true;
+    public static boolean meldePicById(String token, int picId) throws IOException {
+        String urlString = BASE_URL + "api/reports";
+
+        JSONObject toSend = new JSONObject();
+
+        try {
+            toSend.put("PicId", picId);
+        } catch (JSONException e) {
+            return false;
+        }
+
+        String response = InternetConnection.sendJSONtoServer(urlString, toSend, token, true);
+
+        return response != InternetConnection.BAD_REQUEST ? true : false;
     }
 
     public static boolean createTrip(String token, int userId, String name) {
