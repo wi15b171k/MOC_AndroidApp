@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -201,13 +202,63 @@ public class DataProvider {
     }
 
     public static boolean createTrip(String token, int userId, String name) {
-        //TODO call data provider
-        return true;
+        String urlString = BASE_URL + "api/trip";
+
+        JSONObject toSend = new JSONObject();
+
+        try {
+            toSend.put("Title", name);
+        } catch (JSONException e) {
+            return false;
+        }
+
+        String response = null;
+        try {
+            response = InternetConnection.sendJSONtoServer(urlString, toSend, token, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return response != InternetConnection.BAD_REQUEST ? true : false;
     }
 
-    public static List<Trip> getTripsByUserId(String token, int userId) {
-        //TODO call data provider
-        return new ArrayList<Trip>();
+    public static List<Trip> getTripsByUserId(String token, String userId) {
+        String urlString = BASE_URL + "api/Trips/" + userId;
+        String response = null;
+        Trip trip = null;
+        LinkedList<Trip> allTrips = new LinkedList<Trip>();
+        try {
+            response = InternetConnection.sendStringToServer(urlString, "", InternetConnection.REQUEST_GET, token, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            if (response != InternetConnection.BAD_REQUEST) {
+                JSONArray jsonArray = new JSONArray(response);
+                for(int i = 0;i < jsonArray.length();i++) {
+                    JSONObject json = jsonArray.getJSONObject(i);
+                    trip = new Trip();
+
+                    trip.id = json.getInt("TripId");
+                    trip.name = json.getString("Title");
+                    trip.isUserTrip = true;
+
+                    trip.coordinates = new ArrayList<Coordinates>();
+
+                    JSONArray coordinates = json.getJSONArray("Coordinates");
+                    for (int j = 0; j < coordinates.length(); j++) {
+                        JSONObject item = coordinates.getJSONObject(i);
+                        trip.coordinates.add(new Coordinates(item.getDouble("Latitude"), item.getDouble("Latitude")));
+                    }
+                    allTrips.add(trip);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            trip = null;
+        }
+        return allTrips;
     }
 
     public static Trip getTripById(String token, int tripId, int userId) {
@@ -215,25 +266,149 @@ public class DataProvider {
         return new Trip();
     }
 
-    public List<Person> getFriendsByUserId(String token, int userId) {
-        //TODO call data provider
-        return new ArrayList<Person>();
+    public static List<Person> getFriendsByUserId(String token, int userId) {
+        String urlString = BASE_URL + "api/friends";
+
+        String response = null;
+        try {
+            response = InternetConnection.sendStringToServer(urlString, "", InternetConnection.REQUEST_GET, token, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d(LOG_TAG, "String response: " + response);
+
+        LinkedList<Person> personList = new LinkedList<Person>();
+
+        if (response != InternetConnection.BAD_REQUEST) {
+            try {
+                JSONArray jsonArray = new JSONArray(response);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject item = jsonArray.getJSONObject(i);
+
+                    Person person = new Person();
+                    person.userId = item.getString("PersonId");
+                    person.name = item.getString("FirstName") + " " + item.getString("LastName");
+
+                    personList.add(person);
+                }
+            } catch (JSONException e) {
+                personList = new LinkedList<Person>();
+            }
+        }
+
+        return personList;
     }
 
-    public List<Person> searchFriendsByName(String token, String searchString) {
-        //TODO call data provider
-        return new ArrayList<Person>();
+    public static List<Person> searchFriendsByName(String token, String searchString) {
+        List<Person> alreadyFriends = getFriendsByUserId(token,1);
+        if(searchString.equals("") || searchString.equals("Name")) searchString = "xxx";
+        String urlString = BASE_URL + "api/users/"+searchString;
+
+        String response = null;
+        try {
+            response = InternetConnection.sendStringToServer(urlString, "", InternetConnection.REQUEST_GET, token, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d(LOG_TAG, "String response: " + response);
+
+        LinkedList<Person> personList = new LinkedList<Person>();
+
+        if (response != InternetConnection.BAD_REQUEST) {
+            try {
+                JSONArray jsonArray = new JSONArray(response);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject item = jsonArray.getJSONObject(i);
+
+                    Person person = new Person();
+                    person.userId = item.getString("PersonId");
+                    person.name = item.getString("FirstName") + " " + item.getString("LastName");
+
+                    personList.add(person);
+                }
+            } catch (JSONException e) {
+                personList = new LinkedList<Person>();
+            }
+        }
+
+        personList.removeAll(alreadyFriends);
+
+        return personList;
     }
 
+    public static boolean sendInvitationToUser(String token,String receiverId){
+        String urlString = BASE_URL + "api/Requests/"+receiverId;
 
+        JSONObject toSend = new JSONObject();
 
-    public boolean respondToInvitationByUserId(String token, int followerId, int folgt_Id, boolean accepts) {
-        //TODO call data provider
-        return true;
+        try {
+            toSend.put("receiverId", receiverId);
+        } catch (JSONException e) {
+            return false;
+        }
+
+        String response = null;
+        try {
+            response = InternetConnection.sendStringToServer(urlString,receiverId,InternetConnection.REQUEST_POST,token,true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return response != InternetConnection.BAD_REQUEST ? true : false;
     }
 
-    public List<Person> getInvitationsByUserId(String token, int userId) {
-        //TODO call data provider
-        return new ArrayList<Person>();
+    public static boolean respondToInvitationByUserId(String token, int followerId, int folgt_Id, boolean accepts) {
+        String urlString = BASE_URL + "api/Requests/ad/"+followerId;
+
+        JSONObject toSend = new JSONObject();
+
+        try {
+            toSend.put("receiverId", accepts);
+        } catch (JSONException e) {
+            return false;
+        }
+
+        String response = null;
+        try {
+            response = InternetConnection.sendStringToServer(urlString,"true","PUT",token,true);
+            // response = InternetConnection.sendJSONtoServer(urlString, toSend, token, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return response != InternetConnection.BAD_REQUEST ? true : false;
+    }
+
+    public static List<Person> getInvitationsByUserId(String token, int userId) {
+        String urlString = BASE_URL + "api/Requests";
+
+        String response = null;
+        try {
+            response = InternetConnection.sendStringToServer(urlString, "", InternetConnection.REQUEST_GET, token, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d(LOG_TAG, "String response: " + response);
+
+        LinkedList<Person> personList = new LinkedList<Person>();
+
+        if (response != InternetConnection.BAD_REQUEST) {
+            try {
+                JSONArray jsonArray = new JSONArray(response);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject item = jsonArray.getJSONObject(i);
+
+                    Person person = new Person();
+                    person.userId = item.getString("RequestId");
+                    person.name = item.getString("FirstName") + " " + item.getString("LastName");
+
+                    personList.add(person);
+                }
+            } catch (JSONException e) {
+                personList = new LinkedList<Person>();
+            }
+        }
+
+        return personList;
     }
 }

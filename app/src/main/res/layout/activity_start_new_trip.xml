@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.matthias.myapplication.StartNewTrip"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:paddingBottom="30dp"
+        android:text="Start a new trip!"
+        android:textSize="40sp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="30dp">
+    <ImageView
+        android:id="@+id/iv_glob_new_trip"
+        android:src="@drawable/globus"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        tools:src="@drawable/globus"/>
+    <EditText
+        android:id="@+id/et_new_trip_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="22sp"
+        android:padding="15dp"
+        android:text="Name of your trip">
+    </EditText>
+    </LinearLayout>
+        <ImageView
+            android:id="@+id/iv_start_new_trip"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:src="@drawable/play"
+            tools:src="@drawable/play" />
+</LinearLayout>

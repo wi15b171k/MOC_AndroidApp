@@ -32,7 +32,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
     Button mMyLatestTrip;
     Button mStartNewTrip;
-
+    Button mFriends;
+    Button mTrips;
     TextView mLogout;
 
     ProgressBar mProgress;
@@ -58,7 +59,34 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         mMyLatestTrip.setOnClickListener(this);
 
         mStartNewTrip = (Button) findViewById(R.id.btn_start_new_trip);
-        mStartNewTrip.setOnClickListener(this);
+        mStartNewTrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(WelcomeActivity.this,StartNewTrip.class);
+                startActivity(intent);
+
+            }
+        });
+
+        mFriends = (Button) findViewById(R.id.btn_friends_trips);
+        mFriends.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(WelcomeActivity.this,FriendsMainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        mTrips = (Button) findViewById(R.id.btn_my_trips);
+        mTrips.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(WelcomeActivity.this,FriendsTripsActivity.class);
+                intent.putExtra("Id","xxx");
+                intent.putExtra("Name",user);
+                startActivity(intent);
+            }
+        });
 
         mLogout = (TextView) findViewById(R.id.tv_logout);
         mLogout.setOnClickListener(this);
