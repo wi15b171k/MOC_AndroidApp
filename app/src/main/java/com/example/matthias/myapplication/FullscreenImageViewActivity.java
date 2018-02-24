@@ -188,7 +188,7 @@ public class FullscreenImageViewActivity extends AppCompatActivity implements Vi
                 @Override
                 protected Bitmap doInBackground(Void... voids) {
                     try {
-                        return DataProvider.getPicByPicId(accessToken, picId, 0, 0);
+                        return DataProvider.getPicByPicId(accessToken, picId, width, height);
                     } catch (IOException e) {
                         return BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.error);
                     }
