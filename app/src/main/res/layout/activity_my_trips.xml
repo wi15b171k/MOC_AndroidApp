@@ -9,5 +9,5 @@
         android:id="@+id/btn_create_new_trip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Your Trips"/>
+        android:hint="Your Trips"/>
 </android.support.constraint.ConstraintLayout>

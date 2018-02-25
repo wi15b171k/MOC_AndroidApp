@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:textSize="22sp"
         android:padding="15dp"
-        android:text="Name of your trip">
+        android:hint="Name of your trip">
     </EditText>
     </LinearLayout>
         <ImageView
