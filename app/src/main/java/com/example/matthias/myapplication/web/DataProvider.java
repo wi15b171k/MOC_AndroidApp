@@ -70,6 +70,24 @@ public class DataProvider {
         return accessToken;
     }
 
+    public static String getFullNameByUserId(String token) throws IOException {
+        String urlString = BASE_URL + "api/user";
+
+        String response = InternetConnection.sendStringToServer(urlString, "", InternetConnection.REQUEST_GET, token, true);
+
+        try {
+            if (response != InternetConnection.BAD_REQUEST) {
+                JSONObject json = new JSONObject(response);
+                String ret = json.getString("FirstName") + " " + json.getString("LastName");
+                return ret;
+            }
+        } catch (JSONException e) {
+            return "";
+        }
+
+        return "";
+    }
+
     public static boolean logout(String token) throws IOException {
         String urlString = BASE_URL + "api/Account/Logout";
 

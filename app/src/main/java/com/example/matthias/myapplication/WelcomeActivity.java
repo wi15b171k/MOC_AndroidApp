@@ -53,7 +53,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         Log.d(LOG_TAG, "Stored Access Token: " + accessToken);
 
         mUserText = (TextView) findViewById(R.id.tv_username);
-        mUserText.setText("Welcome " + user);
+        mUserText.setText("Welcome!");
+        fetchUserName();
 
         mMyLatestTrip = (Button) findViewById(R.id.btn_my_latest_trip);
         mMyLatestTrip.setOnClickListener(this);
@@ -92,6 +93,29 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         mLogout.setOnClickListener(this);
 
         mProgress = (ProgressBar) findViewById(R.id.pb_welcome_progress_bar);
+    }
+
+    private void fetchUserName() {
+        new AsyncTask<Void, Void, String>() {
+
+            @Override
+            protected String doInBackground(Void... voids) {
+                try {
+                    return DataProvider.getFullNameByUserId(accessToken);
+                } catch (IOException e) {
+                    return "";
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                if (s != "") {
+                    mUserText.setText("Welcome " + s);
+                } else {
+                    mUserText.setText("Name not found");
+                }
+            }
+        }.execute();
     }
 
     @Override
