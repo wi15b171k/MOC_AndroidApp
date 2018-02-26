@@ -57,7 +57,7 @@ public class DataProvider {
         String response = InternetConnection.sendStringToServer(urlString, toSend, InternetConnection.REQUEST_POST,"", false);
         Log.d(LOG_TAG, response);
 
-        String accessToken = "";
+        String accessToken = InternetConnection.BAD_REQUEST;
 
         try {
             JSONObject json = new JSONObject(response);
