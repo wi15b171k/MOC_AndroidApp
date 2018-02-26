@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -79,7 +80,6 @@ public class ViewTripActivity extends FragmentActivity implements OnMapReadyCall
 
     boolean setCameraToCurrentLocation = false; //Wird nur auf true gesetzt, wenn ein neues Foto aufgenommen wurde
 
-    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,14 +128,25 @@ public class ViewTripActivity extends FragmentActivity implements OnMapReadyCall
 
                 }
             };
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+                }
+                return;
+            }
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
             currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (currentLocation == null) { currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);  }
-            if (currentLocation == null) { currentLocation = new Location(""); currentLocation.setLatitude(48.2392831); currentLocation.setLongitude(16.3773241); }
+            //if (currentLocation == null) { currentLocation = new Location(""); currentLocation.setLatitude(48.2392831); currentLocation.setLongitude(16.3773241); }
         } else {
             mTakePicture.setVisibility(View.INVISIBLE);
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
