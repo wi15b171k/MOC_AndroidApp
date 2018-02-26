@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.matthias.myapplication.Entities.Trip;
 import com.example.matthias.myapplication.web.DataProvider;
@@ -168,9 +169,13 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
             @Override
             protected void onPostExecute(Trip response) {
-                Intent intent = new Intent(WelcomeActivity.this, ViewTripActivity.class);
-                intent.putExtra("trip", response);
-                startActivity(intent);
+                if (response == null) {
+                    Toast.makeText(WelcomeActivity.this, "No trip available yet. Start a new one!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(WelcomeActivity.this, ViewTripActivity.class);
+                    intent.putExtra("trip", response);
+                    startActivity(intent);
+                }
 
                 mProgress.setVisibility(View.INVISIBLE);
             }
