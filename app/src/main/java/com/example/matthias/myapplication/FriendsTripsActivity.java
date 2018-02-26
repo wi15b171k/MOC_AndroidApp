@@ -82,6 +82,7 @@ public class FriendsTripsActivity extends AppCompatActivity implements TripsAdap
             @Override
             protected void onPostExecute(Trip response) {
                 Intent intent = new Intent(FriendsTripsActivity.this, ViewTripActivity.class);
+                response.isUserTrip = false;
                 intent.putExtra("trip", response);
                 startActivity(intent);
             }

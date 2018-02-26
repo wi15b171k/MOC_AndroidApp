@@ -1,5 +1,6 @@
 package com.example.matthias.myapplication;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -20,8 +21,10 @@ import android.widget.Toast;
 import com.example.matthias.myapplication.Adapter.FriendsAddAdapter;
 import com.example.matthias.myapplication.Adapter.FriendsMainAdapter;
 import com.example.matthias.myapplication.Entities.Person;
+import com.example.matthias.myapplication.Entities.Trip;
 import com.example.matthias.myapplication.Loader.PersonLoader;
 import com.example.matthias.myapplication.web.DataProvider;
+import com.example.matthias.myapplication.web.InternetConnection;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -124,6 +127,10 @@ public class FriendsAddActivity extends AppCompatActivity implements FriendsAddA
             @Override
             protected Boolean doInBackground(Void... voids) {
                 return DataProvider.sendInvitationToUser(accessToken,mClick.userId);
+            }
+            @Override
+            protected void onPostExecute(Boolean response) {
+                Toast.makeText(FriendsAddActivity.this, "Invitation sent.", Toast.LENGTH_SHORT).show();
             }
         }.execute();
     }

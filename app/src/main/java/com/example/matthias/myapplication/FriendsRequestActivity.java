@@ -93,6 +93,11 @@ public class FriendsRequestActivity extends AppCompatActivity implements Friends
             protected Boolean doInBackground(Void... voids) {
                 return DataProvider.respondToInvitationByUserId(accessToken,Integer.parseInt(clickedPerson.userId),0,true);
             }
+
+            @Override
+            protected void onPostExecute(Boolean response) {
+                Toast.makeText(FriendsRequestActivity.this, "Request accepted.", Toast.LENGTH_SHORT).show();
+            }
         }.execute();
     }
     @Override

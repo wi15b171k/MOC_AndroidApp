@@ -138,7 +138,7 @@ public class ViewTripActivity extends FragmentActivity implements OnMapReadyCall
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
             currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (currentLocation == null) { currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);  }
-            //if (currentLocation == null) { currentLocation = new Location(""); currentLocation.setLatitude(48.2392831); currentLocation.setLongitude(16.3773241); }
+            if (currentLocation == null) { currentLocation = new Location(""); currentLocation.setLatitude(48.2392831); currentLocation.setLongitude(16.3773241); }
         } else {
             mTakePicture.setVisibility(View.INVISIBLE);
         }
